@@ -3,28 +3,87 @@
 @tailwind utilities;
 
 :root {
-  font-family: 'Cormorant Garamond', Georgia, serif;
   color-scheme: light;
   -webkit-tap-highlight-color: transparent;
 }
 
-html, body, #root {
-  height: 100%;
-  width: 100%;
+html, body {
   margin: 0;
   padding: 0;
+  background-color: #FAF6F0;
+  min-height: 100vh;
+  min-height: 100dvh;
+}
+
+.material-symbols-outlined, .material-symbols-rounded, .material-symbols-sharp, .material-icons {
+  display: inline-block;
+  width: 1em;
+  height: 1em;
+  line-height: 1 !important;
+  box-sizing: content-box;
   overflow: hidden;
-  background-color: #B4C6B6;
+  white-space: nowrap;
+  direction: ltr;
+  vertical-align: middle;
 }
 
-/* Prevent unwanted bounce/overscroll on mobile iOS/Chrome */
-body {
-  overscroll-behavior: none;
-  touch-action: manipulation;
+.envelope-stage {
+  perspective: 1200px;
 }
 
-/* Smooth fonts */
-* {
-  -webkit-font-smoothing: antialiased;
-  -moz-osx-font-smoothing: grayscale;
+.unfold-flap {
+  transform-origin: bottom center;
+  transition: transform 650ms cubic-bezier(0.2, 0, 0, 1), opacity 450ms ease-out;
+}
+
+.unfold-flap.is-open {
+  transform: rotateX(0deg);
+  opacity: 1;
+}
+
+.unfold-flap.is-closed {
+  transform: rotateX(-178deg);
+  opacity: 0;
+}
+
+.emerging-card {
+  box-shadow: 0 16px 34px -10px rgba(30, 27, 22, 0.20), 0 4px 10px rgba(65, 45, 0, 0.08);
+  transition: transform 700ms cubic-bezier(0.2, 0, 0, 1), opacity 500ms ease-out;
+}
+
+.emerging-card.is-tucked {
+  transform: translateY(100px) scale(0.92);
+  opacity: 0;
+  pointer-events: none;
+}
+
+.emerging-card.is-revealed {
+  transform: translateY(0px) scale(1);
+  opacity: 1;
+  pointer-events: auto;
+}
+
+.envelope-drop-shadow {
+  box-shadow: 0 24px 48px -14px rgba(30, 27, 22, 0.18), 0 8px 18px -6px rgba(65, 45, 0, 0.10);
+}
+
+.stationery-card-shadow {
+  box-shadow: 0 22px 48px -14px rgba(30, 27, 22, 0.22), 0 6px 16px rgba(65, 45, 0, 0.08);
+}
+
+.wax-seal-shadow {
+  filter: drop-shadow(0 8px 12px rgba(30, 27, 22, 0.25)) drop-shadow(0 2px 4px rgba(65, 45, 0, 0.22));
+}
+
+.wax-deboss-text {
+  text-shadow: 0 1px 0 rgba(233, 193, 118, 0.55), 0 -1px 1px rgba(65, 45, 0, 0.5);
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .unfold-flap,
+  .emerging-card,
+  .action-pill,
+  .seal-interactive {
+    transition: none !important;
+  }
 }

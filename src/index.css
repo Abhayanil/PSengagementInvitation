@@ -1,0 +1,30 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+:root {
+  font-family: 'Cormorant Garamond', Georgia, serif;
+  color-scheme: light;
+  -webkit-tap-highlight-color: transparent;
+}
+
+html, body, #root {
+  height: 100%;
+  width: 100%;
+  margin: 0;
+  padding: 0;
+  overflow: hidden;
+  background-color: #B4C6B6;
+}
+
+/* Prevent unwanted bounce/overscroll on mobile iOS/Chrome */
+body {
+  overscroll-behavior: none;
+  touch-action: manipulation;
+}
+
+/* Smooth fonts */
+* {
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+}

@@ -5,130 +5,178 @@
 :root {
   color-scheme: light;
   -webkit-tap-highlight-color: transparent;
-  --ease-out: cubic-bezier(0.2, 0, 0, 1);
-  --ease-in-out: cubic-bezier(0.77, 0, 0.175, 1);
+  --ivory: #faf6f0;
+  --paper-warm: #f4eee4;
+  --sage: #cbd8ce;
+  --sage-deep: #b7c6bb;
+  --gold: #c5a059;
+  --gold-ink: #8f6d31;
+  --ink: #2c2a29;
+  --taupe: #6e655f;
+  /* SVG fractal noise used as a cotton-paper grain everywhere. */
+  --grain: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='220' height='220'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='.85' numOctaves='3' stitchTiles='stitch'/%3E%3CfeColorMatrix values='0 0 0 0 0.3 0 0 0 0 0.28 0 0 0 0 0.24 0 0 0 .07 0'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)'/%3E%3C/svg%3E");
 }
 
-html, body {
+html,
+body {
   margin: 0;
   padding: 0;
-  background-color: #FAF6F0;
-  min-height: 100vh;
-  min-height: 100dvh;
+  min-height: 100%;
+  background: var(--sage);
+  color: var(--ink);
+  font-family: 'Cormorant Garamond', Georgia, serif;
+  text-rendering: optimizeLegibility;
+  -webkit-font-smoothing: antialiased;
+  font-kerning: normal;
 }
 
-.material-symbols-outlined, .material-symbols-rounded, .material-symbols-sharp, .material-icons {
-  display: inline-block;
-  width: 1em;
-  height: 1em;
-  line-height: 1 !important;
-  box-sizing: content-box;
+body.is-locked {
   overflow: hidden;
-  white-space: nowrap;
-  direction: ltr;
-  vertical-align: middle;
+  touch-action: none;
 }
 
-.envelope-stage {
-  perspective: 1400px;
+/* ---------------------------------------------------------------- type --- */
+
+/* Tracked small labels. Ligatures off so letter-spacing never splits words. */
+.label {
+  font-family: Jost, system-ui, sans-serif;
+  font-size: 11.5px;
+  line-height: 1.5;
+  font-weight: 500;
+  letter-spacing: 0.22em;
+  text-transform: uppercase;
+  font-variant-ligatures: none;
+  font-feature-settings: 'liga' 0, 'clig' 0;
+  /* balance the trailing tracking so centred labels sit truly centred */
+  text-indent: 0.22em;
 }
 
-.action-pill {
-  transition: transform 160ms var(--ease-out), background-color 160ms var(--ease-out);
+.amp {
+  font-family: 'Cormorant Garamond', Georgia, serif;
+  font-style: italic;
+  font-weight: 300;
+  line-height: 1;
 }
 
-.action-pill:active {
+/* ------------------------------------------------------------ surfaces --- */
+
+.page-paper {
+  background-color: var(--sage);
+  background-image: var(--grain),
+    radial-gradient(120% 70% at 50% 0%, rgba(255, 255, 255, 0.45), transparent 60%),
+    radial-gradient(140% 90% at 50% 110%, rgba(64, 84, 70, 0.18), transparent 60%);
+}
+
+.intro-paper {
+  background-color: var(--ivory);
+  background-image: var(--grain),
+    radial-gradient(90% 60% at 50% 45%, #fffdf8 0%, transparent 70%),
+    radial-gradient(140% 100% at 50% 50%, transparent 55%, rgba(110, 101, 95, 0.12) 100%);
+}
+
+.card-paper {
+  background-color: var(--ivory);
+  background-image: var(--grain),
+    linear-gradient(180deg, #fdfaf4 0%, var(--ivory) 40%, #f6f0e6 100%);
+}
+
+.card-shadow {
+  box-shadow:
+    0 1px 0 rgba(255, 255, 255, 0.8) inset,
+    0 30px 60px -24px rgba(36, 48, 40, 0.38),
+    0 10px 22px -10px rgba(36, 48, 40, 0.18);
+}
+
+.letter-shadow {
+  box-shadow: 0 -2px 6px rgba(36, 48, 40, 0.08), 0 10px 24px -8px rgba(36, 48, 40, 0.22);
+}
+
+.envelope-shadow {
+  box-shadow: 0 28px 40px -18px rgba(40, 52, 44, 0.4), 0 8px 14px -6px rgba(40, 52, 44, 0.18);
+}
+
+.seal-shadow {
+  filter: drop-shadow(0 6px 7px rgba(60, 42, 10, 0.32)) drop-shadow(0 1px 1.5px rgba(60, 42, 10, 0.35));
+}
+
+/* ----------------------------------------------------------- idle cues --- */
+
+@keyframes float {
+  0%, 100% { transform: translateY(0); }
+  50% { transform: translateY(-5px); }
+}
+.idle-float {
+  animation: float 5.5s ease-in-out infinite;
+}
+
+@keyframes seal-halo {
+  0% { transform: scale(0.85); opacity: 0.55; }
+  70% { transform: scale(1.55); opacity: 0; }
+  100% { transform: scale(1.55); opacity: 0; }
+}
+.seal-halo {
+  animation: seal-halo 2.6s cubic-bezier(0.2, 0.6, 0.3, 1) infinite;
+}
+
+@keyframes breathe {
+  0%, 100% { opacity: 0.55; }
+  50% { opacity: 1; }
+}
+.breathe {
+  animation: breathe 3s ease-in-out infinite;
+}
+
+/* ----------------------------------------------------- card choreography --- */
+
+.reveal {
+  opacity: 0;
+  transform: translateY(10px);
+  filter: blur(3px);
+}
+.is-revealed .reveal {
+  animation: reveal 900ms cubic-bezier(0.22, 0.61, 0.36, 1) forwards;
+  animation-delay: calc(var(--i, 0) * 110ms);
+}
+.reveal-instant .reveal {
+  opacity: 1;
+  transform: none;
+  filter: none;
+  animation: none !important;
+}
+@keyframes reveal {
+  to {
+    opacity: 1;
+    transform: none;
+    filter: blur(0);
+  }
+}
+
+.fade-in-late {
+  animation: fade-in 700ms ease-out both;
+}
+@keyframes fade-in {
+  from { opacity: 0; }
+  to { opacity: 1; }
+}
+
+.pill {
+  transition: transform 160ms cubic-bezier(0.2, 0, 0, 1), background-color 200ms ease, box-shadow 200ms ease;
+}
+.pill:active {
   transform: scale(0.97);
 }
 
-.seal-interactive {
-  transition: transform 120ms var(--ease-out);
-}
-
-.seal-interactive:active {
-  transform: scale(0.95);
-}
-
-.envelope-drop-shadow {
-  box-shadow: 0 24px 48px -14px rgba(30, 27, 22, 0.18), 0 8px 18px -6px rgba(65, 45, 0, 0.10);
-}
-
-.stationery-card-shadow {
-  box-shadow: 0 22px 48px -14px rgba(30, 27, 22, 0.22), 0 6px 16px rgba(65, 45, 0, 0.08);
-}
-
-.wax-seal-shadow {
-  filter: drop-shadow(0 8px 12px rgba(30, 27, 22, 0.25)) drop-shadow(0 2px 4px rgba(65, 45, 0, 0.22));
-}
-
-.wax-deboss-text {
-  text-shadow: 0 1px 0 rgba(233, 193, 118, 0.55), 0 -1px 1px rgba(65, 45, 0, 0.5);
-}
-
-/* Card rises out of the envelope pocket, then its contents stagger in. */
-.card-rise {
-  opacity: 0;
-  animation: card-rise 1200ms cubic-bezier(0.25, 0.8, 0.25, 1) 300ms forwards;
-}
-
-@keyframes card-rise {
-  from {
-    opacity: 0;
-    transform: translateY(110px);
-  }
-  to {
-    opacity: 1;
-    transform: translateY(0);
-  }
-}
-
-.reveal-item {
-  opacity: 0;
-  animation: reveal-up 560ms cubic-bezier(0.25, 0.8, 0.25, 1) forwards;
-  animation-delay: var(--reveal-delay, 0ms);
-}
-
-@keyframes reveal-up {
-  from {
-    opacity: 0;
-    transform: translateY(12px);
-  }
-  to {
-    opacity: 1;
-    transform: translateY(0);
-  }
-}
-
-.replay-fade,
-.audio-fade {
-  animation: replay-fade 400ms ease-out 1500ms both;
-}
-
-@keyframes replay-fade {
-  from {
-    opacity: 0;
-    transform: translateY(-6px);
-  }
-  to {
-    opacity: 1;
-    transform: translateY(0);
-  }
-}
-
 @media (prefers-reduced-motion: reduce) {
-  .action-pill,
-  .seal-interactive,
-  .envelope-flap,
-  .stage-lift {
-    transition: none !important;
+  .idle-float,
+  .seal-halo,
+  .breathe {
+    animation: none !important;
   }
-
-  .card-rise,
-  .reveal-item,
-  .replay-fade,
-  .audio-fade {
+  .reveal,
+  .is-revealed .reveal {
     animation: none !important;
     opacity: 1 !important;
     transform: none !important;
+    filter: none !important;
   }
 }

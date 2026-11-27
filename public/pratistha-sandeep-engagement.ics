@@ -1,0 +1,22 @@
+BEGIN:VCALENDAR
+VERSION:2.0
+PRODID:-//Pratistha & Sandeep//Engagement Invitation//EN
+CALSCALE:GREGORIAN
+METHOD:PUBLISH
+BEGIN:VEVENT
+UID:engagement-pratistha-sandeep-20261227@invitation
+DTSTAMP:20261101T000000Z
+DTSTART:20261227T043000Z
+DTEND:20261227T093000Z
+SUMMARY:Engagement: Pratistha Sharma & Sandeep Sadasivam
+DESCRIPTION:Join us in celebrating the engagement of Pratistha Sharma and Sandeep Sadasivam with love and laughter.
+LOCATION:7 Sprinkles Cafe
+STATUS:CONFIRMED
+TRANSP:OPAQUE
+BEGIN:VALARM
+TRIGGER:-P1D
+ACTION:DISPLAY
+DESCRIPTION:Engagement of Pratistha & Sandeep tomorrow at 10:00 AM
+END:VALARM
+END:VEVENT
+END:VCALENDAR

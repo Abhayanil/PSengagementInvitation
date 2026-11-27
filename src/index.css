@@ -172,11 +172,12 @@ body.is-locked {
   .breathe {
     animation: none !important;
   }
-  .reveal,
+  /* Keep the gentle fade, drop the movement and blur. */
+  .reveal {
+    transform: none;
+    filter: none;
+  }
   .is-revealed .reveal {
-    animation: none !important;
-    opacity: 1 !important;
-    transform: none !important;
-    filter: none !important;
+    animation-name: fade-in;
   }
 }

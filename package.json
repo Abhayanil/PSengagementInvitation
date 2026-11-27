@@ -5,6 +5,8 @@
   "type": "module",
   "scripts": {
     "dev": "vite",
+    "ics": "node scripts/generate-ics.mjs",
+    "prebuild": "node scripts/generate-ics.mjs",
     "build": "vite build",
     "preview": "vite preview"
   },

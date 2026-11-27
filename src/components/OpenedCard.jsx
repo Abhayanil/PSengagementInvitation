@@ -23,6 +23,11 @@ export default function OpenedCard({ className = '' }) {
     setTimeout(() => setDateSaved(false), 3000);
   };
 
+  const reveal = (delay) => ({
+    className: 'reveal-item',
+    style: { '--reveal-delay': `${delay}ms` },
+  });
+
   return (
     <article
       className={`stationery-card-shadow relative z-20 w-full max-w-sm bg-ivory-card rounded-md border border-antique-gold/55 p-gutter-xs select-text ${className}`}
@@ -32,7 +37,7 @@ export default function OpenedCard({ className = '' }) {
       <div className="w-full rounded-sm border border-antique-gold/35 px-gutter-md py-gutter-lg flex flex-col items-center text-center gap-gutter-md">
         
         {/* Eyebrow Header */}
-        <header>
+        <header {...reveal(650)}>
           <span
             data-component-id="card-eyebrow"
             data-component-type="typography"
@@ -45,10 +50,13 @@ export default function OpenedCard({ className = '' }) {
         </header>
 
         {/* Center Illustration Frame (4:5 portrait) */}
-        <div className="w-44 sm:w-48 aspect-[4/5] rounded-sm border border-antique-gold/25 overflow-hidden bg-ivory-card flex items-center justify-center">
+        <div
+          {...reveal(750)}
+          className="reveal-item w-44 sm:w-48 aspect-[4/5] rounded-sm border border-antique-gold/25 overflow-hidden bg-ivory-card flex items-center justify-center"
+        >
           {!imgError ? (
             <img
-              src="/couple-illustration.png"
+              src="/couple.png"
               alt="Watercolor illustration of Pratistha and Sandeep beneath a white-and-sage floral arch"
               className="w-full h-full object-cover object-top select-none"
               onError={() => setImgError(true)}
@@ -67,18 +75,20 @@ export default function OpenedCard({ className = '' }) {
 
         {/* Couple Names in Flowing Antique Gold Script Calligraphy */}
         <h1
+          {...reveal(890)}
           data-component-id="card-couple-names"
           data-component-type="typography"
           data-component-variant="display"
           data-design-text-token="script-lg"
-          className="font-script text-script-lg text-antique-gold-script leading-tight px-1"
+          className="reveal-item font-script text-script-lg text-antique-gold-script leading-tight px-1"
         >
           Pratistha Sharma &amp;<br />Sandeep Sadasivam
         </h1>
 
         {/* Minimal Gold Divider with Center Diamond */}
         <div
-          className="flex items-center justify-center gap-gutter-sm w-36 select-none"
+          {...reveal(1030)}
+          className="reveal-item flex items-center justify-center gap-gutter-sm w-36 select-none"
           aria-hidden="true"
         >
           <span className="h-px flex-1 bg-antique-gold/50" />
@@ -88,18 +98,20 @@ export default function OpenedCard({ className = '' }) {
 
         {/* Italicized Quote */}
         <p
+          {...reveal(1170)}
           data-component-id="card-quote"
           data-component-type="typography"
           data-component-variant="body"
           data-design-text-token="body-md"
-          className="font-display text-body-md italic text-dark-charcoal text-pretty max-w-xs"
+          className="reveal-item font-display text-body-md italic text-dark-charcoal text-pretty max-w-xs"
         >
           &ldquo;Two hearts, one journey. Join us as we celebrate our engagement with love and laughter.&rdquo;
         </p>
 
         {/* Event Details Block */}
         <section
-          className="flex flex-col items-center gap-gutter-xs py-gutter-xs"
+          {...reveal(1310)}
+          className="reveal-item flex flex-col items-center gap-gutter-xs py-gutter-xs"
           aria-label="Event Date, Venue, and Time"
         >
           <span
@@ -123,7 +135,10 @@ export default function OpenedCard({ className = '' }) {
         </section>
 
         {/* Action Row: View Location & Save the Date */}
-        <div className="flex items-center justify-center gap-gutter-sm w-full pt-gutter-xs select-none">
+        <div
+          {...reveal(1450)}
+          className="reveal-item flex items-center justify-center gap-gutter-sm w-full pt-gutter-xs select-none"
+        >
           {/* COMPONENT: button-with-icon */}
           <button
             id="view-location-btn"

@@ -1,32 +1,48 @@
-import React, { useState } from 'react';
-import OpenedCard from './OpenedCard';
+import React, { useEffect, useRef, useState } from 'react';
 
 /**
  * StationeryStage: Persistent 3D Interactive Envelope Rig
  * Connects Stitch's closed_envelope/code.html, envelope_unfolding/code.html,
  * and opened_invitation_card/code.html using Emil Kowalski's Design Engineering framework.
  */
-export default function StationeryStage({ isOpen, onOpen }) {
+export default function StationeryStage({ isOpen, onOpen, onStartAudio }) {
   const [isPressing, setIsPressing] = useState(false);
   const [sealFading, setSealFading] = useState(false);
+  const timers = useRef([]);
+
+  useEffect(() => () => timers.current.forEach(clearTimeout), []);
 
   const handleSealClick = (e) => {
     e.stopPropagation();
     if (isOpen || isPressing) return;
 
-    // 1. Tactile press feedback (120ms var(--ease-out))
+    // Start (or resume) the score inside the tap gesture so autoplay is allowed.
+    onStartAudio?.();
+
+    // Honor reduced-motion: skip the staged press/fade and open immediately.
+    if (window.matchMedia?.('(prefers-reduced-motion: reduce)').matches) {
+      onOpen();
+      return;
+    }
+
+    // 1. Gentle tactile press (150ms)
     setIsPressing(true);
 
-    setTimeout(() => {
-      setIsPressing(false);
-      setSealFading(true);
-
-      // 2. Trigger envelope 3D unseal sequence
+    timers.current.push(
       setTimeout(() => {
-        onOpen();
-        setSealFading(false);
-      }, 160);
-    }, 120);
+        setIsPressing(false);
+        // 2. Deliberate release: fade + slight scale-up (200ms)
+        setSealFading(true);
+
+        // 3. Unseal at ~350ms
+        timers.current.push(
+          setTimeout(() => {
+            onOpen();
+            setSealFading(false);
+          }, 200)
+        );
+      }, 150)
+    );
   };
 
   return (
@@ -35,7 +51,7 @@ export default function StationeryStage({ isOpen, onOpen }) {
       {/* 3D Envelope Container with 1200px perspective */}
       <div
         className="envelope-stage relative w-full aspect-[4/3] rounded-sm bg-sage-mint-paper envelope-drop-shadow"
-        style={{ perspective: '1200px' }}
+        style={{ perspective: '1400px' }}
       >
         {/* ========================================================================= */}
         {/* SVG DEFS FOR GRAIN, SHADOWS, GRADIENTS (Exact from Stitch) */}
@@ -135,13 +151,20 @@ export default function StationeryStage({ isOpen, onOpen }) {
         {/* Transform-origin is top center (y=0). Rotates rotateX(0deg) -> rotateX(180deg) */}
         {/* ========================================================================= */}
         <div
-          className={`absolute top-0 left-0 w-full h-[58%] pointer-events-none transition-all duration-[600ms] ease-[cubic-bezier(0.2,0,0,1)] ${
+          className={`envelope-flap absolute top-0 left-0 w-full h-[58%] pointer-events-none ${
             isOpen ? 'z-5' : 'z-25'
           }`}
           style={{
             transformOrigin: 'top center',
             transformStyle: 'preserve-3d',
-            transform: isOpen ? 'rotateX(180deg)' : 'rotateX(0deg)',
+            transform: isOpen ? 'rotateX(-175deg)' : 'rotateX(0deg)',
+            opacity: isOpen ? 0 : 1,
+            transitionProperty: 'transform, opacity, z-index',
+            transitionDuration: isOpen ? '1100ms, 400ms, 0ms' : '520ms, 0ms, 0ms',
+            transitionDelay: isOpen ? '0ms, 1400ms, 500ms' : '0ms, 0ms, 0ms',
+            transitionTimingFunction: isOpen
+              ? 'cubic-bezier(0.25, 0.8, 0.25, 1), ease-out, linear'
+              : 'cubic-bezier(0.2, 0, 0, 1), linear, linear',
           }}
         >
           {/* --- FACE 1: Closed Flap (Front / Outside, visible when rotateX(0deg)) --- */}
@@ -174,68 +197,22 @@ export default function StationeryStage({ isOpen, onOpen }) {
               <rect x="0" y="0" width="360" height="160" filter="url(#cotton-grain-clean)" />
             </svg>
 
-            {/* Flap Calligraphy Text */}
-            <div className="absolute top-6 left-0 right-0 flex justify-center text-center px-4 pointer-events-none">
+            {/* Flap Calligraphy Text (front only; hidden before the flap passes vertical) */}
+            <div
+              className="absolute top-6 left-0 right-0 flex justify-center text-center px-4 pointer-events-none"
+              style={{
+                backfaceVisibility: 'hidden',
+                WebkitBackfaceVisibility: 'hidden',
+                opacity: isOpen ? 0 : 1,
+                transition: 'opacity 180ms ease-out',
+              }}
+            >
               <p
                 data-design-text-token="body-md"
                 className="font-display text-body-md italic text-dark-on-primary leading-snug max-w-[200px]"
               >
                 The Beginning of Our Forever
               </p>
-            </div>
-
-            {/* Tactile Antique Gold Wax Seal (Positioned at Flap Apex) */}
-            <div
-              className={`absolute left-1/2 bottom-[-18px] -translate-x-1/2 z-30 transition-all duration-300 ease-out ${
-                sealFading || isOpen ? 'opacity-0 scale-110 pointer-events-none' : 'opacity-100 scale-100'
-              }`}
-            >
-              <button
-                id="wax-seal-trigger"
-                type="button"
-                data-component-id="button-icon"
-                data-component-type="button"
-                data-component-variant="icon"
-                aria-label="Tap seal to open engagement invitation"
-                onClick={handleSealClick}
-                className={`seal-interactive relative w-16 h-16 rounded-full flex items-center justify-center cursor-pointer transition-transform duration-seal-press ease-seal-press hover:scale-105 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-4 focus-visible:outline-gold-shadow ${
-                  isPressing ? 'scale-95' : 'active:scale-95'
-                }`}
-              >
-                <svg
-                  className="w-full h-full wax-seal-shadow pointer-events-none"
-                  viewBox="0 0 120 120"
-                  aria-hidden="true"
-                >
-                  <path
-                    d="M60,5 C69,4 78,8 86,11 C94,14 103,19 108,28 C113,37 115,47 116,57 C117,67 113,77 109,86 C105,95 97,104 88,109 C79,114 69,115 59,116 C49,117 39,113 30,108 C21,103 14,96 9,87 C4,78 4,67 4,57 C4,47 7,37 12,28 C17,19 25,13 34,9 C43,5 51,6 60,5 Z"
-                    fill="url(#wax-body-clean)"
-                  />
-                  <circle
-                    cx="60"
-                    cy="60"
-                    r="41"
-                    fill="#CBA65E"
-                    stroke="url(#wax-rim-clean)"
-                    strokeWidth="4.5"
-                  />
-                  <circle
-                    cx="60"
-                    cy="60"
-                    r="37"
-                    fill="none"
-                    stroke="#775A19"
-                    strokeWidth="1"
-                    strokeOpacity="0.55"
-                  />
-                </svg>
-                <span
-                  data-design-text-token="label-lg"
-                  className="absolute inset-0 flex items-center justify-center font-title text-label-lg text-dark-on-primary wax-deboss-text select-none"
-                >
-                  P&amp;S
-                </span>
-              </button>
             </div>
           </div>
 
@@ -277,20 +254,61 @@ export default function StationeryStage({ isOpen, onOpen }) {
         </div>
 
         {/* ========================================================================= */}
-        {/* 3. HERO INVITATION CARD (Layer 20 - Slides Upward out of Pocket) */}
-        {/* Staged slide: translateY(120px) scale(0.94) -> translateY(-40px) scale(1) */}
+        {/* WAX SEAL — Positioned at the flap apex (56% from top of envelope stage)   */}
+        {/* Lives OUTSIDE the flap div so it stays put during the 3D rotation         */}
+        {/* Exact position from closed_envelope/code.html line 242                    */}
         {/* ========================================================================= */}
         <div
-          className={`absolute left-0 right-0 z-20 flex justify-center px-2 transition-all duration-[650ms] ease-[cubic-bezier(0.2,0,0,1)] ${
-            isOpen
-              ? 'opacity-100 pointer-events-auto transform -translate-y-28 sm:-translate-y-32 scale-100'
-              : 'opacity-0 pointer-events-none transform translate-y-16 scale-95'
+          className={`absolute left-1/2 top-[56%] -translate-x-1/2 -translate-y-1/2 z-30 transition-all duration-200 ease-out will-change-transform ${
+            sealFading || isOpen ? 'opacity-0 scale-[1.06] pointer-events-none' : 'opacity-100 scale-100'
           }`}
-          style={{
-            transitionDelay: isOpen ? '160ms' : '0ms',
-          }}
         >
-          <OpenedCard />
+          <button
+            id="wax-seal-trigger"
+            type="button"
+            data-component-id="button-icon"
+            data-component-type="button"
+            data-component-variant="icon"
+            aria-label="Tap seal to open engagement invitation"
+            onClick={handleSealClick}
+            className={`seal-interactive relative w-16 h-16 rounded-full flex items-center justify-center cursor-pointer transition-transform duration-seal-press ease-seal-press hover:scale-105 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-4 focus-visible:outline-gold-shadow ${
+              isPressing ? 'scale-95' : 'active:scale-95'
+            }`}
+          >
+            <svg
+              className="w-full h-full wax-seal-shadow pointer-events-none"
+              viewBox="0 0 120 120"
+              aria-hidden="true"
+            >
+              <path
+                d="M60,5 C69,4 78,8 86,11 C94,14 103,19 108,28 C113,37 115,47 116,57 C117,67 113,77 109,86 C105,95 97,104 88,109 C79,114 69,115 59,116 C49,117 39,113 30,108 C21,103 14,96 9,87 C4,78 4,67 4,57 C4,47 7,37 12,28 C17,19 25,13 34,9 C43,5 51,6 60,5 Z"
+                fill="url(#wax-body-clean)"
+              />
+              <circle
+                cx="60"
+                cy="60"
+                r="41"
+                fill="#CBA65E"
+                stroke="url(#wax-rim-clean)"
+                strokeWidth="4.5"
+              />
+              <circle
+                cx="60"
+                cy="60"
+                r="37"
+                fill="none"
+                stroke="#775A19"
+                strokeWidth="1"
+                strokeOpacity="0.55"
+              />
+            </svg>
+            <span
+              data-design-text-token="label-lg"
+              className="absolute inset-0 flex items-center justify-center font-title text-label-lg text-dark-on-primary wax-deboss-text select-none"
+            >
+              P&amp;S
+            </span>
+          </button>
         </div>
 
         {/* ========================================================================= */}

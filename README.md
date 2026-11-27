@@ -8,12 +8,14 @@ A mobile-first, interactive engagement invitation web app featuring a 3D opening
 - **Tactile Antique Gold Wax Seal**: Organic molten edges, debossed monogram initials **"P & S"**, realistic rim bevel, ambient shadows, and gentle pulsing glow with helper text: *"Tap the seal to open"*.
 - **Floral Accents**: Dusty onion pink (`#D8A1A8`) blossoms, white roses, eucalyptus sage leaves, and gold foil sprigs tucked into the corner of the envelope flap.
 - **Single Framed Ivory Card**:
-  - Arched frame displaying the couple illustration with romantic SVG fallback art.
-  - Flowing calligraphy for the couple's names (*Alex Brush* / *Cormorant Garamond*).
+  - Arched frame displaying the watercolor couple illustration (`/couple.png`) with a graceful text fallback.
+  - Flowing calligraphy for the couple's names (*Great Vibes* / *Libre Baskerville*).
   - Delicate gold diamond divider and romantic quote.
   - Event details: **Sunday, 27th December 2026**, **10:00 AM – 3:00 PM**, **7 Sprinkles Cafe**.
   - **Google Maps** one-tap venue directions.
   - **Save the Date** downloading a compliant RFC 5545 `.ics` calendar invitation in IST.
+  - **Calm ambient score** synthesized with the Web Audio API (no external audio file), fading in over 1.5s on the seal tap, with a matching mute/unmute toggle in the corner.
+  - **Measured ~2.3s reveal choreography** — delicate seal press, slow flap unfolding, weighted card rise, and a spaced content stagger.
   - **Replay button** to seamlessly fold the envelope back and replay the reveal.
 - **Mobile-First & 60fps GPU Accelerated**: Optimized for iPhone and Android touch viewports (`100dvh`), centered on desktop displays.
 

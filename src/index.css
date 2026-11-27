@@ -30,7 +30,7 @@ html, body {
 }
 
 .envelope-stage {
-  perspective: 1200px;
+  perspective: 1400px;
 }
 
 .action-pill {
@@ -65,9 +65,70 @@ html, body {
   text-shadow: 0 1px 0 rgba(233, 193, 118, 0.55), 0 -1px 1px rgba(65, 45, 0, 0.5);
 }
 
+/* Card rises out of the envelope pocket, then its contents stagger in. */
+.card-rise {
+  opacity: 0;
+  animation: card-rise 1200ms cubic-bezier(0.25, 0.8, 0.25, 1) 300ms forwards;
+}
+
+@keyframes card-rise {
+  from {
+    opacity: 0;
+    transform: translateY(110px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+.reveal-item {
+  opacity: 0;
+  animation: reveal-up 560ms cubic-bezier(0.25, 0.8, 0.25, 1) forwards;
+  animation-delay: var(--reveal-delay, 0ms);
+}
+
+@keyframes reveal-up {
+  from {
+    opacity: 0;
+    transform: translateY(12px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+.replay-fade,
+.audio-fade {
+  animation: replay-fade 400ms ease-out 1500ms both;
+}
+
+@keyframes replay-fade {
+  from {
+    opacity: 0;
+    transform: translateY(-6px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
 @media (prefers-reduced-motion: reduce) {
   .action-pill,
-  .seal-interactive {
+  .seal-interactive,
+  .envelope-flap,
+  .stage-lift {
     transition: none !important;
+  }
+
+  .card-rise,
+  .reveal-item,
+  .replay-fade,
+  .audio-fade {
+    animation: none !important;
+    opacity: 1 !important;
+    transform: none !important;
   }
 }

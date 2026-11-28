@@ -1,6 +1,7 @@
 import React, { forwardRef, useState } from 'react';
 import { CalendarPlus, MapPin } from 'lucide-react';
 import { EVENT, googleCalendarUrl } from '../eventDetails';
+import coupleArtwork from '../Actual Couple.webp';
 
 const isAndroid = typeof navigator !== 'undefined' && /android/i.test(navigator.userAgent);
 
@@ -47,8 +48,10 @@ const InvitationCard = forwardRef(function InvitationCard({ revealed, hidden, st
               <div className="aspect-[382/500] overflow-hidden rounded-t-full bg-[#F2EBDF]">
                 {!imgError ? (
                   <img
-                    src="/couple.png"
+                    src={coupleArtwork}
                     alt="Watercolor illustration of Pratistha and Sandeep beneath a white-and-sage floral arch"
+                    width="896"
+                    height="1200"
                     className="h-full w-full object-cover object-top"
                     onError={() => setImgError(true)}
                     draggable="false"
@@ -75,7 +78,7 @@ const InvitationCard = forwardRef(function InvitationCard({ revealed, hidden, st
               Sandeep
             </span>
             <span {...r(6)} className="label reveal mt-2.5 text-[12px] text-[#5E5650]">
-              Sadasivam
+              Sadhasivam
             </span>
           </h1>
 

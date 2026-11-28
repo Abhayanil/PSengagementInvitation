@@ -16,6 +16,9 @@ import WaxSeal from './WaxSeal';
  * Tapping anywhere while it plays skips straight to the invitation.
  */
 
+const touchDevice =
+  typeof window !== 'undefined' && window.matchMedia?.('(hover: none) and (pointer: coarse)').matches;
+
 const EASE = {
   press: [0.3, 0, 0.2, 1],
   fall: [0.45, 0, 0.8, 0.5],
@@ -48,6 +51,7 @@ export default function EnvelopeIntro({ soundRef, cardRef, onReveal, onDone }) {
 
   const skipping = useRef(false);
   const live = useRef(new Set());
+  const states = useRef(new WeakMap());
   const wakers = useRef(new Set());
 
   useEffect(
@@ -70,13 +74,57 @@ export default function EnvelopeIntro({ soundRef, cardRef, onReveal, onDone }) {
     return () => window.removeEventListener('keydown', onKey);
   });
 
-  const A = (el, keyframes, options) => {
+  /*
+   * Tween helper. Framer Motion's animate(element) silently makes transforms
+   * instant when the phone has "reduce motion" on, which killed the whole
+   * opening on many phones. Animating a plain 0→1 number has no such rule,
+   * so we drive the element styles ourselves from its progress.
+   */
+  const stateOf = (el) => {
+    let st = states.current.get(el);
+    if (!st) {
+      const o = parseFloat(getComputedStyle(el).opacity);
+      st = { x: 0, y: 0, rotate: 0, rotateX: 0, scale: 1, opacity: Number.isNaN(o) ? 1 : o, clipBottom: null };
+      states.current.set(el, st);
+    }
+    return st;
+  };
+  const paint = (el, st) => {
+    el.style.transform = `translate3d(${st.x}px, ${st.y}px, 0) rotate(${st.rotate}deg) rotateX(${st.rotateX}deg) scale(${st.scale})`;
+    el.style.opacity = String(st.opacity);
+    if (st.clipBottom != null) el.style.clipPath = `inset(0px 0px ${st.clipBottom}px 0px round 6px)`;
+  };
+
+  const A = (el, target, options = {}) => {
     if (!el) return Promise.resolve();
-    const opts = skipping.current ? { ...options, duration: 0, delay: 0 } : options;
-    const controls = animate(el, keyframes, opts);
+    const st = stateOf(el);
+    const from = {};
+    const to = {};
+    Object.entries(target).forEach(([k, v]) => {
+      if (Array.isArray(v)) {
+        [from[k], to[k]] = v;
+      } else {
+        from[k] = st[k] ?? 0;
+        to[k] = v;
+      }
+    });
+    const step = (t) => {
+      Object.keys(to).forEach((k) => {
+        st[k] = from[k] + (to[k] - from[k]) * t;
+      });
+      paint(el, st);
+    };
+    if (skipping.current) {
+      step(1);
+      return Promise.resolve();
+    }
+    step(0);
+    const { duration = 0.3, delay = 0, ease = 'easeInOut' } = options;
+    const controls = animate(0, 1, { duration, delay, ease, onUpdate: step });
     live.current.add(controls);
     return Promise.resolve(controls).then(() => {
       live.current.delete(controls);
+      step(1);
     });
   };
 
@@ -112,8 +160,9 @@ export default function EnvelopeIntro({ soundRef, cardRef, onReveal, onDone }) {
     sound?.unlock();
 
     const r = Object.fromEntries(Object.entries(refs).map(([k, v]) => [k, v.current]));
-    const reduce = window.matchMedia?.('(prefers-reduced-motion: reduce)').matches;
-    if (reduce) skipping.current = true;
+    // Note: the opening plays even with "reduce motion" on — it only starts when the
+    // guest taps, can be skipped any time, and is the heart of the invitation.
+    // Ambient looping motion (float, seal halo) stays off for those users via CSS.
 
     r.float?.classList.remove('idle-float');
     sound?.hush(2.5);
@@ -176,17 +225,15 @@ export default function EnvelopeIntro({ soundRef, cardRef, onReveal, onDone }) {
     const letterH = from.height * scale;
     const hidden = Math.max(0, to.height - letterH);
     card.style.clipPath = `inset(0px 0px ${hidden}px 0px round 6px)`;
+    stateOf(card).clipBottom = hidden;
     onReveal?.();
     A(r.letter, { opacity: 0 }, { duration: 0.5, ease: 'easeOut' });
     await Promise.all([
       A(card, { opacity: [0, 1] }, { duration: 0.5, ease: 'easeOut' }),
-      A(
-        card,
-        { clipPath: [`inset(0px 0px ${hidden}px 0px round 6px)`, 'inset(0px 0px 0px 0px round 6px)'] },
-        { duration: 1.5, ease: EASE.glide, delay: 0.15 }
-      ),
+      A(card, { clipBottom: [hidden, 0] }, { duration: 1.5, ease: EASE.glide, delay: 0.15 }),
     ]);
     card.style.clipPath = '';
+    card.style.transform = '';
     onDone?.();
   };
 
@@ -236,7 +283,7 @@ export default function EnvelopeIntro({ soundRef, cardRef, onReveal, onDone }) {
         style={{ opacity: 0 }}
         aria-hidden="true"
       >
-        Tap anywhere or press Esc to skip
+        {touchDevice ? 'Tap anywhere to skip' : 'Click or press Esc to skip'}
       </p>
     </div>
   );
@@ -312,7 +359,7 @@ function Envelope({ refs, opening }) {
       <div
         ref={refs.letter}
         className="card-paper letter-shadow absolute left-[5%] top-[5%] h-[88%] w-[90%] rounded-[4px]"
-        style={{ zIndex: 2, transformOrigin: '0 0' }}
+        style={{ zIndex: 2, transformOrigin: '0 0', willChange: 'transform, opacity' }}
         aria-hidden="true"
       >
         <div className="absolute inset-[7px] rounded-[2px] border border-[#C5A059]/50" />
@@ -346,7 +393,7 @@ function Envelope({ refs, opening }) {
       <div
         ref={refs.flap}
         className="absolute left-0 top-0 h-[63%] w-full"
-        style={{ zIndex: 4, transformOrigin: '50% 0%', transformStyle: 'preserve-3d' }}
+        style={{ zIndex: 4, transformOrigin: '50% 0%', transformStyle: 'preserve-3d', willChange: 'transform' }}
         aria-hidden="true"
       >
         <svg className="absolute inset-0 h-full w-full" viewBox="0 0 340 150" preserveAspectRatio="none" style={{ backfaceVisibility: 'hidden', WebkitBackfaceVisibility: 'hidden' }}>

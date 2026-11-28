@@ -6,9 +6,9 @@
  * TODO: add the confirmed venue address + exact Google Maps link.
  */
 export const EVENT = {
-  title: 'Engagement: Pratistha Sharma & Sandeep Sadasivam',
+  title: 'Engagement: Pratistha Sharma & Sandeep Sadhasivam',
   description:
-    'Join us in celebrating the engagement of Pratistha Sharma and Sandeep Sadasivam with love and laughter.',
+    'Join us in celebrating the engagement of Pratistha Sharma and Sandeep Sadhasivam with love and laughter.',
   venueName: '7 Sprinkles Cafe',
   venueAddress: '', // e.g. '12 MG Road, Indiranagar, Bengaluru' — shown under the venue name when set
   mapsUrl: 'https://www.google.com/maps/search/?api=1&query=7+Sprinkles+Cafe',

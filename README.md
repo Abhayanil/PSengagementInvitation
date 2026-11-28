@@ -1,6 +1,6 @@
 # Engagement Celebration — Interactive Digital Invitation
 
-A mobile-first, interactive engagement invitation web app featuring a 3D opening envelope, realistic antique gold wax seal, and elegant framed celebration card for **Pratistha Sharma & Sandeep Sadasivam**.
+A mobile-first, interactive engagement invitation web app featuring a 3D opening envelope, realistic antique gold wax seal, and elegant framed celebration card for **Pratistha Sharma & Sandeep Sadhasivam**.
 
 ## ✨ Features & Visual Design
 

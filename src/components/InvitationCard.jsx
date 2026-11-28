@@ -1,7 +1,7 @@
 import React, { forwardRef, useState } from 'react';
 import { CalendarPlus, MapPin } from 'lucide-react';
 import { EVENT, googleCalendarUrl } from '../eventDetails';
-import coupleArtwork from '../Actual Couple.png';
+import coupleArtwork from '../Actual Couple.webp';
 
 const isAndroid = typeof navigator !== 'undefined' && /android/i.test(navigator.userAgent);
 
@@ -50,6 +50,8 @@ const InvitationCard = forwardRef(function InvitationCard({ revealed, hidden, st
                   <img
                     src={coupleArtwork}
                     alt="Watercolor illustration of Pratistha and Sandeep beneath a white-and-sage floral arch"
+                    width="896"
+                    height="1200"
                     className="h-full w-full object-cover object-top"
                     onError={() => setImgError(true)}
                     draggable="false"
